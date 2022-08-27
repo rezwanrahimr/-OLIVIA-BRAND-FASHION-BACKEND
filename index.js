@@ -29,6 +29,12 @@ async function run() {
             res.send(result);
         })
 
+        app.post('/products',async(req,res)=>{
+            const data = req.body;
+            const result = await ProductCollectin.insertOne(data);
+            res.send(result);
+        })
+
     }
     finally {
 

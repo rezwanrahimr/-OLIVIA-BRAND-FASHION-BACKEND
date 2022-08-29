@@ -12,7 +12,7 @@ app.use(express.json());
 
 // MongoDB Connected.
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.m4rxkkc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -33,6 +33,17 @@ async function run() {
             const data = req.body;
             const result = await ProductCollectin.insertOne(data);
             res.send(result);
+        })
+
+        // Cart Product.
+        app.get('/products/:id',async(req,res)=>{
+            const id = req.params.id;
+            const quary = {_id: ObjectId(id)}
+            const data = ProductCollectin.find(quary);
+            const result = await data.toArray()
+            res.send(result);
+
+
         })
 
     }

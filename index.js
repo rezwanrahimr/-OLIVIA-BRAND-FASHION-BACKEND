@@ -22,6 +22,7 @@ async function run() {
         await client.connect();
         const ProductCollectin = client.db('productCollection').collection('product');
 
+        // Get all Products.
         app.get('/products', async (req, res) => {
             const quary = {};
             const cursor = ProductCollectin.find(quary);
@@ -29,6 +30,24 @@ async function run() {
             res.send(result);
         })
 
+        // Get Product with Page and Size.
+        app.get('/productss',async(req,res)=>{
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            console.log(page,size)
+            const quary = {};
+            const data = ProductCollectin.find(quary);
+            let result;
+            if(page || size){
+                result = await data.skip(page*size).limit(size).toArray();
+            }
+            else(
+              result = await data.toArray()
+            )
+            res.send(result)
+        })
+
+        // Post a New Product.
         app.post('/products',async(req,res)=>{
             const data = req.body;
             const result = await ProductCollectin.insertOne(data);
@@ -42,10 +61,13 @@ async function run() {
             const data = ProductCollectin.find(quary);
             const result = await data.toArray()
             res.send(result);
-
-
         })
 
+        // Products Count
+        app.get('/productsCount',async(req,res)=>{
+            const result = await ProductCollectin.countDocuments();
+            res.send({result});
+        })
     }
     finally {
 

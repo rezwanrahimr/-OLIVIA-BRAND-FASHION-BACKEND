@@ -92,7 +92,7 @@ async function run() {
         })
 
         // Get all Products.
-        app.get('/products', verifyJWT, async (req, res) => {
+        app.get('/products', async (req, res) => {
             const quary = {};
             const cursor = ProductCollectin.find(quary);
             const result = await cursor.toArray();

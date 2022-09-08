@@ -38,6 +38,7 @@ async function run() {
         await client.connect();
         const ProductCollectin = client.db('productCollection').collection('product');
         const UserCollectin = client.db('productCollection').collection('users');
+        const CartCollectin = client.db('productCollection').collection('cart');
 
         // User Collection.
         app.put('/user/:email', async (req, res) => {
@@ -67,6 +68,14 @@ async function run() {
             res.send(result);
         })
 
+        // Get User by Email.
+        app.get('/user/:email',async(req,res)=>{
+            const email = req.params.email;
+            const quary = {email: email}
+            const data = UserCollectin.find(quary);
+            const result = await data.toArray();
+            res.send(result);
+        })
         // Check Admin
         app.get('/admin/:email',async(req,res)=>{
             const email =  req.params.email;
@@ -136,6 +145,32 @@ async function run() {
             res.send(result);
         })
 
+        // Post Cart products
+        app.post('/payment',async(req,res)=>{
+            const data = req.body;
+            const result =  await CartCollectin.insertOne(data);
+            res.send(result);
+        })
+
+        // Get My Order dat.
+        app.get('/order/:email',async(req,res)=>{
+            const email = req.params.email;
+            const quary = {userName: email};
+            const data = CartCollectin.find(quary);
+            const result = await data.toArray();
+            res.send(result);
+        })
+
+        // Get product by id.
+        app.get('/payment/:id',async(req,res)=>{
+            const id = req.params.id;
+            const quary = {_id: ObjectId(id)};
+            const data = CartCollectin.find(quary);
+            const result = await data.toArray();
+            res.send(result);
+        })
+
+
         // Cart Product.
         app.get('/products/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
@@ -146,6 +181,7 @@ async function run() {
             const result = await data.toArray()
             res.send(result);
         })
+
 
         // Products Count
         app.get('/productsCount', async (req, res) => {

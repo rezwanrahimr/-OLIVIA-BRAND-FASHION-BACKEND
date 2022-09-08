@@ -54,6 +54,19 @@ async function run() {
         })
 
 
+        // Upate User Data.
+        app.put('/userDataUpdate/:email',async(req,res)=>{
+            const email =  req.params.email;
+            const ProfileData = req.body;
+            const filter = {email: email};
+            const options = {upsert: true};
+            const updateDoc = {
+                $set: ProfileData
+            };
+            const result =  await UserCollectin.updateOne(filter,updateDoc,options);
+            res.send(result);
+        })
+
         // Check Admin
         app.get('/admin/:email',async(req,res)=>{
             const email =  req.params.email;

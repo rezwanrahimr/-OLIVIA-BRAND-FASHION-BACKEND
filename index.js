@@ -4,6 +4,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 
 //midelware
@@ -39,6 +40,21 @@ async function run() {
         const ProductCollectin = client.db('productCollection').collection('product');
         const UserCollectin = client.db('productCollection').collection('users');
         const CartCollectin = client.db('productCollection').collection('cart');
+
+
+        // Payment
+        app.post('/createPayment', async(req, res) =>{
+            const service = req.body;
+            const price = service.CartProductPrice;
+            const amount = price*100;
+            const paymentIntent = await stripe.paymentIntents.create({
+              amount : amount,
+              currency: 'usd',
+              payment_method_types:['card']
+            });
+            res.send({clientSecret: paymentIntent.client_secret})
+          });
+
 
         // User Collection.
         app.put('/user/:email', async (req, res) => {
@@ -171,6 +187,13 @@ async function run() {
         })
 
 
+        app.get('/card/:id', async(req, res) =>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const card = await CartCollectin.findOne(query);
+            res.send(card);
+          })
+      
         // Cart Product.
         app.get('/products/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;

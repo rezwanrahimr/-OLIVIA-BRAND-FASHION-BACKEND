@@ -40,6 +40,7 @@ async function run() {
         const ProductCollectin = client.db('productCollection').collection('product');
         const UserCollectin = client.db('productCollection').collection('users');
         const CartCollectin = client.db('productCollection').collection('cart');
+        const PaymentCollectin = client.db('productCollection').collection('payment');
 
 
         // Payment
@@ -193,6 +194,26 @@ async function run() {
             const card = await CartCollectin.findOne(query);
             res.send(card);
           })
+
+
+        //   
+
+        app.put('/card/:id', async (req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = {_id: ObjectId(id)};
+            const options = { upsert: true };
+            const updateDoc = {
+                $set:{
+                    paid:true,
+                    transationId: payment.transationId
+                }
+            };
+            const updateCart = await CartCollectin.updateOne(filter, updateDoc, options);
+            const result = await PaymentCollectin.insertOne(payment);
+            res.send(updateDoc);
+            
+        })
       
         // Cart Product.
         app.get('/products/:id', verifyJWT, async (req, res) => {

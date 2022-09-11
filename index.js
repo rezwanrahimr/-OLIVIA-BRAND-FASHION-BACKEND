@@ -44,17 +44,17 @@ async function run() {
 
 
         // Payment
-        app.post('/createPayment', async(req, res) =>{
+        app.post('/createPayment', async (req, res) => {
             const service = req.body;
             const price = service.CartProductPrice;
-            const amount = price*100;
+            const amount = price * 100;
             const paymentIntent = await stripe.paymentIntents.create({
-              amount : amount,
-              currency: 'usd',
-              payment_method_types:['card']
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
             });
-            res.send({clientSecret: paymentIntent.client_secret})
-          });
+            res.send({ clientSecret: paymentIntent.client_secret })
+        });
 
 
         // User Collection.
@@ -73,32 +73,32 @@ async function run() {
 
 
         // Upate User Data.
-        app.put('/userDataUpdate/:email',async(req,res)=>{
-            const email =  req.params.email;
+        app.put('/userDataUpdate/:email', async (req, res) => {
+            const email = req.params.email;
             const ProfileData = req.body;
-            const filter = {email: email};
-            const options = {upsert: true};
+            const filter = { email: email };
+            const options = { upsert: true };
             const updateDoc = {
                 $set: ProfileData
             };
-            const result =  await UserCollectin.updateOne(filter,updateDoc,options);
+            const result = await UserCollectin.updateOne(filter, updateDoc, options);
             res.send(result);
         })
 
         // Get User by Email.
-        app.get('/user/:email',async(req,res)=>{
+        app.get('/user/:email', async (req, res) => {
             const email = req.params.email;
-            const quary = {email: email}
+            const quary = { email: email }
             const data = UserCollectin.find(quary);
             const result = await data.toArray();
             res.send(result);
         })
         // Check Admin
-        app.get('/admin/:email',async(req,res)=>{
-            const email =  req.params.email;
-            const user = await UserCollectin.findOne({email: email});
-            const isAdmin =  user.role  === 'admin';
-            res.send({admin: isAdmin});
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await UserCollectin.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin });
         })
         // Admin role.
         app.put('/user/admin/:email', verifyJWT, async (req, res) => {
@@ -115,8 +115,8 @@ async function run() {
                 res.send(result);
 
             }
-            else{
-                res.status(403).send({message: 'forbidden'});
+            else {
+                res.status(403).send({ message: 'forbidden' });
             }
 
 
@@ -128,6 +128,14 @@ async function run() {
             const data = UserCollectin.find(quary);
             const result = await data.toArray();
             res.send(result);
+        })
+
+        // Delete User form Database.
+        app.delete('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const quary = { _id: ObjectId(id) };
+            const data = await UserCollectin.deleteOne(quary);
+            res.send(data);
         })
 
         // Get all Products.
@@ -163,58 +171,72 @@ async function run() {
         })
 
         // Post Cart products
-        app.post('/payment',async(req,res)=>{
+        app.post('/payment', async (req, res) => {
             const data = req.body;
-            const result =  await CartCollectin.insertOne(data);
+            const result = await CartCollectin.insertOne(data);
             res.send(result);
         })
 
         // Get My Order dat.
-        app.get('/order/:email',async(req,res)=>{
+        app.get('/order/:email', async (req, res) => {
             const email = req.params.email;
-            const quary = {userName: email};
+            const quary = { userName: email };
             const data = CartCollectin.find(quary);
             const result = await data.toArray();
             res.send(result);
         })
 
+        // Delete product in the card.
+        app.delete('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const quary = { _id: ObjectId(id) };
+            const data = await CartCollectin.deleteOne(quary);
+            res.send(data);
+        })
         // Get product by id.
-        app.get('/payment/:id',async(req,res)=>{
+        app.get('/payment/:id', async (req, res) => {
             const id = req.params.id;
-            const quary = {_id: ObjectId(id)};
+            const quary = { _id: ObjectId(id) };
             const data = CartCollectin.find(quary);
             const result = await data.toArray();
             res.send(result);
         })
 
 
-        app.get('/card/:id', async(req, res) =>{
+        app.get('/card/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const card = await CartCollectin.findOne(query);
             res.send(card);
-          })
+        })
 
+        //  Get all orders.
+        app.get('/orders', async (req, res) => {
+            const quary = {};
+            const data = CartCollectin.find(quary);
+            const result = await data.toArray();
+            res.send(result);
+        })
 
         //   
 
         app.put('/card/:id', async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
-            const filter = {_id: ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
             const updateDoc = {
-                $set:{
-                    paid:true,
+                $set: {
+                    paid: true,
                     transationId: payment.transationId
                 }
             };
             const updateCart = await CartCollectin.updateOne(filter, updateDoc, options);
             const result = await PaymentCollectin.insertOne(payment);
             res.send(updateDoc);
-            
+
         })
-      
+
         // Cart Product.
         app.get('/products/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;

@@ -146,6 +146,14 @@ async function run() {
             res.send(result);
         })
 
+        // Delete Products.
+        app.delete('/product/:id', async(req,res)=>{
+            const id = req.params.id;
+            const quary = {_id: ObjectId(id)};
+            const result = await ProductCollectin.deleteOne(quary);
+            res.send(result);
+        })
+
         // Get Product with Page and Size.
         app.get('/productss', async (req, res) => {
             const page = parseInt(req.query.page);

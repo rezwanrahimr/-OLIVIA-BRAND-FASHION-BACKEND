@@ -80,7 +80,13 @@ async function run() {
             const filter = {_id: ObjectId(id)};
             const options = { upsert: true };
             const updateDoc = {
-                $set: ProfileData
+                $set: {
+                    Name: ProfileData. Name,
+                    Number: ProfileData.Number,
+                    Address: ProfileData.Address,
+                    Image : ProfileData.Address
+
+                }
             };
             const result = await UserCollectin.updateOne(filter, updateDoc, options);
             res.send(result);
@@ -89,8 +95,7 @@ async function run() {
         // Get User by Email.
         app.get('/user/:email', async (req, res) => {
             const email = req.params.email;
-            const quary = { email: email }
-            const data = UserCollectin.find(quary);
+            const data = UserCollectin.find({email: email});
             const result = await data.toArray();
             res.send(result);
         })

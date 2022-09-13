@@ -103,7 +103,7 @@ async function run() {
         // Admin role.
         app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
-            const requester = req.decoded.email;
+            const requester = req.decoded?.email;
             const requesterAccount = await UserCollectin.findOne({ email: requester });
             if (requesterAccount.role === 'admin') {
 

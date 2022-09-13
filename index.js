@@ -103,21 +103,13 @@ async function run() {
         // Admin role.
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
-            const requester = req.decoded?.email;
-            const requesterAccount = await UserCollectin.findOne({ email: requester });
-            if (requesterAccount?.role === 'admin') {
-                const filter = { email: email };
-                const updateDoc = {
-                    $set: { role: 'admin' },
-                };
-                const result = await UserCollectin.updateOne(filter, updateDoc);
-                res.send(result);
-
-            }
-            else {
-                res.status(403).send({ message: 'forbidden' });
-            }
-
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: { role: 'admin' },
+            };
+            const result = await UserCollectin.updateOne(filter, updateDoc,options);
+            res.send(result);
 
         })
 
@@ -146,9 +138,9 @@ async function run() {
         })
 
         // Delete Products.
-        app.delete('/product/:id', async(req,res)=>{
+        app.delete('/product/:id', async (req, res) => {
             const id = req.params.id;
-            const quary = {_id: ObjectId(id)};
+            const quary = { _id: ObjectId(id) };
             const result = await ProductCollectin.deleteOne(quary);
             res.send(result);
         })

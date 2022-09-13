@@ -73,10 +73,11 @@ async function run() {
 
 
         // Upate User Data.
-        app.put('/userDataUpdate/:email', async (req, res) => {
-            const email = req.params.email;
+        app.put('/userDataUpdate/:id', async (req, res) => {
+            const id = req.params.id;
             const ProfileData = req.body;
-            const filter = { email: email };
+            console.log(ProfileData);
+            const filter = {_id: ObjectId(id)};
             const options = { upsert: true };
             const updateDoc = {
                 $set: ProfileData
